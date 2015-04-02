@@ -1,6 +1,8 @@
 import java.io.IOException;
 
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 /*
  * Scrapes data from a web site.
@@ -10,6 +12,7 @@ import org.jsoup.nodes.Document;
 public class ShodorScraper extends BaseScraper {
     private static final String BASE_URI =
         "http://www.shodor.org/interactivate/activities";
+    private static final String ROOT_SELECTOR = "div#listing0";
 
     public ShodorScraper() {
         super(BASE_URI);
@@ -50,5 +53,17 @@ public class ShodorScraper extends BaseScraper {
      */
     public Document byAudience() throws IOException {
         return download(Endpoint.BY_AUDIENCE);
+    }
+
+    protected static Element rootElement(Document doc) throws Exception {
+        Elements elts = doc.select(ROOT_SELECTOR);
+
+        if (elts.size() != 1) {
+            throw new Exception(
+                String.format("Selector found %d elements in root search",
+                    elts.size()));
+        }
+
+        return elts.first();
     }
 }

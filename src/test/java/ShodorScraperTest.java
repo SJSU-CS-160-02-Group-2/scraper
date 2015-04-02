@@ -1,6 +1,7 @@
 import java.io.IOException;
 
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -34,7 +35,8 @@ public class ShodorScraperTest {
     }
 
     @Test
-    public void testDownloadWebDocument() throws IOException {
-
+    public void testRootElement() throws Exception {
+        Element rootElt = ShodorScraper.rootElement(bySubjectDoc);
+        assertNotNull(rootElt);
     }
 }
