@@ -8,7 +8,7 @@ import org.jsoup.nodes.Document;
  *
  * @author dead10ck, @date 4/2/15 11:58 AM
  */
-public class Scraper {
+public class ShodorScraper {
     private static final String BASE_URI =
         "http://www.shodor.org/interactivate/activities/";
 

@@ -13,20 +13,20 @@ import static org.junit.Assert.*;
  *
  * @author dead10ck, @date 4/2/15 11:58 AM
  */
-public class ScraperTest {
+public class ShodorScraperTest {
     @SuppressWarnings("unused")
-    private static Logger logger = LoggerFactory.getLogger(ScraperTest.class);
+    private static Logger logger = LoggerFactory.getLogger(ShodorScraperTest.class);
     private static Document bySubjectDoc;
     private static Document byAudienceDoc;
 
     @BeforeClass
     public static void setUp() throws IOException {
-        bySubjectDoc = Scraper.getDocument(Scraper.Endpoint.BY_SUBJECT);
+        bySubjectDoc = ShodorScraper.getDocument(ShodorScraper.Endpoint.BY_SUBJECT);
         //logger.info(String.format("Document text:\n%s\n", bySubjectDoc.outerHtml()));
         assertNotNull(bySubjectDoc);
         assertTrue(0 < bySubjectDoc.childNodes().size());
 
-        byAudienceDoc = Scraper.getDocument(Scraper.Endpoint.BY_AUDIENCE);
+        byAudienceDoc = ShodorScraper.getDocument(ShodorScraper.Endpoint.BY_AUDIENCE);
         //logger.info(String.format("Document text:\n%s\n", byAudienceDoc.outerHtml()));
         assertNotNull(byAudienceDoc);
         assertTrue(0 < byAudienceDoc.childNodes().size());
