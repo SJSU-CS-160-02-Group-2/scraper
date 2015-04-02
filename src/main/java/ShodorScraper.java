@@ -1,6 +1,5 @@
 import java.io.IOException;
 
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 /*
@@ -8,13 +7,17 @@ import org.jsoup.nodes.Document;
  *
  * @author dead10ck, @date 4/2/15 11:58 AM
  */
-public class ShodorScraper {
+public class ShodorScraper extends BaseScraper {
     private static final String BASE_URI =
-        "http://www.shodor.org/interactivate/activities/";
+        "http://www.shodor.org/interactivate/activities";
+
+    public ShodorScraper() {
+        super(BASE_URI);
+    }
 
     public enum Endpoint {
-        BY_SUBJECT("bySubject/"),
-        BY_AUDIENCE("byAudience/");
+        BY_SUBJECT("/bySubject"),
+        BY_AUDIENCE("/byAudience");
 
         private String endpointString;
 
@@ -30,8 +33,8 @@ public class ShodorScraper {
         }
     }
 
-    public static Document getDocument(Endpoint ep) throws IOException {
-        String url = BASE_URI + ep.toString();
-        return Jsoup.connect(url).get();
+    public Document download(Endpoint ep) throws IOException {
+        String url = baseUri + ep.toString();
+        return download(url);
     }
 }

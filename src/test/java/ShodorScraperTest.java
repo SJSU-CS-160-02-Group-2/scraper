@@ -16,17 +16,18 @@ import static org.junit.Assert.*;
 public class ShodorScraperTest {
     @SuppressWarnings("unused")
     private static Logger logger = LoggerFactory.getLogger(ShodorScraperTest.class);
+    private static ShodorScraper scraper = new ShodorScraper();
     private static Document bySubjectDoc;
     private static Document byAudienceDoc;
 
     @BeforeClass
     public static void setUp() throws IOException {
-        bySubjectDoc = ShodorScraper.getDocument(ShodorScraper.Endpoint.BY_SUBJECT);
+        bySubjectDoc = scraper.download(ShodorScraper.Endpoint.BY_SUBJECT);
         //logger.info(String.format("Document text:\n%s\n", bySubjectDoc.outerHtml()));
         assertNotNull(bySubjectDoc);
         assertTrue(0 < bySubjectDoc.childNodes().size());
 
-        byAudienceDoc = ShodorScraper.getDocument(ShodorScraper.Endpoint.BY_AUDIENCE);
+        byAudienceDoc = scraper.download(ShodorScraper.Endpoint.BY_AUDIENCE);
         //logger.info(String.format("Document text:\n%s\n", byAudienceDoc.outerHtml()));
         assertNotNull(byAudienceDoc);
         assertTrue(0 < byAudienceDoc.childNodes().size());
