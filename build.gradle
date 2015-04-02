@@ -7,11 +7,19 @@ apply plugin: 'java'
 apply plugin: 'application'
 apply plugin: 'eclipse'
 
+// mainClassName = "MainClassName"
+
 repositories {
     jcenter()
 }
 
 dependencies {
-    compile 'org.slf4j:slf4j-api:1.7.7'
+    compile 'org.slf4j:slf4j-api:1.7.+'
+    compile 'org.slf4j:slf4j-simple:1.7.+'
+    compile 'org.jsoup:jsoup:1.8.+'
     testCompile 'junit:junit:4.11'
+}
+
+test {
+    testLogging.showStandardStreams = true
 }
