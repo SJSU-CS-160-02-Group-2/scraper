@@ -37,4 +37,18 @@ public class ShodorScraper extends BaseScraper {
         String url = baseUri + ep.toString();
         return download(url);
     }
+
+    /**
+     * @return the HTML Document from the "bySubject" endpoint
+     */
+    public Document bySubject() throws IOException {
+        return download(Endpoint.BY_SUBJECT);
+    }
+
+    /**
+     * @return the HTML Document from the "byAudience" endpoint
+     */
+    public Document byAudience() throws IOException {
+        return download(Endpoint.BY_AUDIENCE);
+    }
 }

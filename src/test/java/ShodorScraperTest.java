@@ -22,12 +22,12 @@ public class ShodorScraperTest {
 
     @BeforeClass
     public static void setUp() throws IOException {
-        bySubjectDoc = scraper.download(ShodorScraper.Endpoint.BY_SUBJECT);
+        bySubjectDoc = scraper.bySubject();
         //logger.info(String.format("Document text:\n%s\n", bySubjectDoc.outerHtml()));
         assertNotNull(bySubjectDoc);
         assertTrue(0 < bySubjectDoc.childNodes().size());
 
-        byAudienceDoc = scraper.download(ShodorScraper.Endpoint.BY_AUDIENCE);
+        byAudienceDoc = scraper.byAudience();
         //logger.info(String.format("Document text:\n%s\n", byAudienceDoc.outerHtml()));
         assertNotNull(byAudienceDoc);
         assertTrue(0 < byAudienceDoc.childNodes().size());
