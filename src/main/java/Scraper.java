@@ -1,5 +1,5 @@
 import java.io.IOException;
-import java.util.List;
+import java.util.Set;
 
 import org.jsoup.nodes.Document;
 
@@ -19,5 +19,5 @@ public interface Scraper {
      *
      * @return the list of site entries
      */
-    public List<SiteEntry> scrape(Document doc);
+    public Set<SiteEntry> scrape(Document doc);
 }

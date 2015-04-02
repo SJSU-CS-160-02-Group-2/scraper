@@ -1,6 +1,6 @@
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -69,7 +69,7 @@ public class ShodorScraper extends BaseScraper {
         return elts.first();
     }
 
-    public List<SiteEntry> scrape(Document doc) {
-        return new ArrayList<>();
+    public Set<SiteEntry> scrape(Document doc) {
+        return new HashSet<>();
     }
 }

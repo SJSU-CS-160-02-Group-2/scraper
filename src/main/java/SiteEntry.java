@@ -68,6 +68,27 @@ public class SiteEntry {
         return contributors;
     }
 
+    // Base the hashCode and equality on the activity URL so that duplicates
+    // get weeded out in HashSets
+    @Override
+    public int hashCode() {
+        return activityUrl.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return this == null;
+        }
+
+        if (!(obj instanceof SiteEntry)) {
+            return false;
+        }
+
+        SiteEntry other = (SiteEntry) obj;
+        return this.activityUrl.equals(other.getActivityUrl());
+    }
+
     public static class Builder {
         private String title;
         private String description;
