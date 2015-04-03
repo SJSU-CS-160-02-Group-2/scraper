@@ -1,5 +1,7 @@
+import java.io.File;
 import java.io.IOException;
 
+import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
@@ -24,13 +26,15 @@ public class ShodorScraperTest {
 
     @BeforeClass
     public static void setUp() throws IOException {
-        bySubjectDoc = scraper.bySubject();
-        //logger.info(String.format("Document text:\n%s\n", bySubjectDoc.outerHtml()));
+        ClassLoader loader = ShodorScraperTest.class.getClassLoader();
+        File bySubjectFile = new File(loader.getResource("bySubject.htm").getFile());
+        File byAudienceFile = new File(loader.getResource("byAudience.htm").getFile());
+
+        bySubjectDoc = Jsoup.parse(bySubjectFile, "UTF-8", "http://www.shodor.org/");
         assertNotNull(bySubjectDoc);
         assertTrue(0 < bySubjectDoc.childNodes().size());
 
-        byAudienceDoc = scraper.byAudience();
-        //logger.info(String.format("Document text:\n%s\n", byAudienceDoc.outerHtml()));
+        byAudienceDoc = Jsoup.parse(byAudienceFile, "UTF-8", "http://www.shodor.org/");
         assertNotNull(byAudienceDoc);
         assertTrue(0 < byAudienceDoc.childNodes().size());
     }
