@@ -2,6 +2,7 @@ import java.io.IOException;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.nodes.Node;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -35,8 +36,24 @@ public class ShodorScraperTest {
     }
 
     @Test
-    public void testRootElement() throws Exception {
+    public void testRootElement() {
         Element rootElt = ShodorScraper.rootElement(bySubjectDoc);
         assertNotNull(rootElt);
+    }
+
+    @Test
+    public void testScrapeCategory() throws Exception {
+        Element rootElt = ShodorScraper.rootElement(bySubjectDoc);
+        assertNotNull(rootElt);
+
+        Node catNode = rootElt.childNodes().get(0);
+        assertNotNull(catNode);
+        String category = scraper.scrapeCategory(catNode);
+        assertEquals("algebra", category);
+
+        catNode = rootElt.childNodes().get(1);
+        assertNotNull(catNode);
+        category = scraper.scrapeCategory(catNode);
+        assertEquals("calculus", category);
     }
 }
