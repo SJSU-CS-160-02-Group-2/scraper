@@ -39,16 +39,20 @@ public class ShodorScraperTest {
         assertTrue(0 < byAudienceDoc.childNodes().size());
     }
 
-    @Test
-    public void testRootElement() {
+    public Element getRootElt() {
         Element rootElt = ShodorScraper.rootElement(bySubjectDoc);
         assertNotNull(rootElt);
+        return rootElt;
+    }
+
+    @Test
+    public void testRootElement() {
+        getRootElt();
     }
 
     @Test
     public void testScrapeCategory() throws Exception {
-        Element rootElt = ShodorScraper.rootElement(bySubjectDoc);
-        assertNotNull(rootElt);
+        Element rootElt = getRootElt();
 
         Node catNode = rootElt.childNodes().get(0);
         assertNotNull(catNode);
@@ -59,5 +63,26 @@ public class ShodorScraperTest {
         assertNotNull(catNode);
         category = scraper.scrapeCategory(catNode);
         assertEquals("calculus", category);
+    }
+
+    @Test
+    public void testScrapeRowTitle() {
+        Element rootElt = getRootElt();
+        Element algebraCategoryElt = rootElt.select("> div").first();
+        //logger.info(algebraCategoryNode.outerHtml());
+        Element firstAlgebraNode = algebraCategoryElt.select("> div:not(div.listingHeader)").first();
+        //logger.info(firstAlgebraNode.outerHtml());
+        SiteEntry.Builder builder = new SiteEntry.Builder();
+        scraper.scrapeRowTitle(builder, firstAlgebraNode);
+        assertEquals("3D Transmographer", builder.getTitle());
+        assertEquals("http://www.shodor.org/interactivate/activities/3DTransmographer/",
+                builder.getActivityUrl());
+        assertEquals("http://www.shodor.org/media/N/j/Z/mNDk4YjUzYmRhMjhlODE2MDA0NzA2NjExNGIxNzQ.png",
+                builder.getIconImageUrl());
+    }
+
+    @Test
+    public void testScrape() throws Exception {
+        scraper.scrape(bySubjectDoc);
     }
 }

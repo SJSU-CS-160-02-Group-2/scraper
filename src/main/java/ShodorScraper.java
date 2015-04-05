@@ -1,6 +1,7 @@
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -9,6 +10,8 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
 import org.jsoup.select.Elements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /*
  * Scrapes data from a web site.
@@ -16,12 +19,15 @@ import org.jsoup.select.Elements;
  * @author dead10ck, @date 4/2/15 11:58 AM
  */
 public class ShodorScraper extends BaseScraper {
+    private static final Logger log = LoggerFactory.getLogger(ShodorScraper.class);
+    private static final String DOMAIN = "http://www.shodor.org";
     private static final String BASE_URI =
         "http://www.shodor.org/interactivate/activities";
     private static final String ROOT_SELECTOR = "div#listing0";
 
     private static final int CATEGORY_ID_GROUP_NUM = 1;
     private static final Pattern categoryIdPattern = Pattern.compile("listing0_ctg(\\d)");
+    private static final Pattern relativeImagePathPattern = Pattern.compile("background-image:url\\('(.+)'\\);");
 
     private static final HashMap<Integer, String> categories;
 
@@ -99,11 +105,29 @@ public class ShodorScraper extends BaseScraper {
         Element root = rootElement(doc);
 
         // each child of the root node is the category div
-        for (Node categoryNode : root.childNodes()) {
-            String category = scrapeCategory(categoryNode);
+        for (Element categoryElement : root.select("> div")) {
+            String category;
+
+            try{
+                category = scrapeCategory(categoryElement);
+            } catch (Exception e) {
+                // skip elements that don't match this pattern
+                continue;
+            }
+
+            Elements categoryChildren = categoryElement.select("> div:not(div.listingHeader)");
+
+            for (Element siteElement : categoryChildren) {
+                SiteEntry.Builder builder = new SiteEntry.Builder();
+                builder.withCategory(category);
+                scrapeRowTitle(builder, siteElement);
+
+                SiteEntry siteEntry = builder.toSiteEntry();
+                log.info(siteEntry.toString());
+            }
         }
 
-        return new HashSet<>();
+        return sites;
     }
 
     /**
@@ -128,5 +152,37 @@ public class ShodorScraper extends BaseScraper {
         }
 
         return category;
+    }
+
+    /**
+     * Scrapes all data from the div.rowTitle element of the given
+     * site node.
+     */
+    protected SiteEntry.Builder scrapeRowTitle(SiteEntry.Builder builder,
+            Element siteElement) {
+        //log.info(siteElt.outerHtml());
+        Element rowTitleElt = siteElement.select("div.rowTitle").first();
+
+        // get the title
+        Element anchorElt = rowTitleElt.select("> a").first();
+        String title = anchorElt.text();
+        builder.withTitle(title);
+
+        // get the activity URL
+        String activityUrl = anchorElt.attr("href");
+        builder.withActivityUrl(activityUrl);
+
+        // get the image URL
+        Element imageDiv = rowTitleElt.select("> div").first();
+        String styleStr = imageDiv.attr("style");
+        //log.info(styleStr);
+
+        Matcher m = relativeImagePathPattern.matcher(styleStr);
+        m.find();
+        String relPath = m.group(1);
+        String imagePath = DOMAIN + relPath;
+        builder.withIconImageUrl(imagePath);
+
+        return builder;
     }
 }

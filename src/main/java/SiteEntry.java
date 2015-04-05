@@ -1,3 +1,4 @@
+import java.util.HashSet;
 import java.util.Set;
 
 public class SiteEntry {
@@ -17,6 +18,16 @@ public class SiteEntry {
         this.iconImageUrl = builder.getIconImageUrl();
         this.activityUrl = builder.getActivityUrl();
         this.contributors = builder.getContributors();
+    }
+
+    @Override
+    public String toString() {
+        return String.format(
+            "title:%s description:%s categories:%s targetGrades:%s" +
+            " iconImageUrl:%s activityUrl:%s contributors:%s",
+            title, description, categories, targetGrades, iconImageUrl,
+            activityUrl, contributors
+        );
     }
 
     /**
@@ -105,6 +116,15 @@ public class SiteEntry {
 
         public Builder withDescription(String description) {
             this.description = description;
+            return this;
+        }
+
+        public Builder withCategory(String category) {
+            if (this.categories == null) {
+                this.categories = new HashSet<String>();
+            }
+
+            this.categories.add(category);
             return this;
         }
 
