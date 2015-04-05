@@ -52,10 +52,24 @@ public class SiteEntry {
     }
 
     /**
+     * @param categories the categories to set
+     */
+    public void setCategories(Set<String> categories) {
+        this.categories = categories;
+    }
+
+    /**
      * @return the targetGrades
      */
     public Set<Integer> getTargetGrades() {
         return targetGrades;
+    }
+
+    /**
+     * @param targetGrades the targetGrades to set
+     */
+    public void setTargetGrades(Set<Integer> targetGrades) {
+        this.targetGrades = targetGrades;
     }
 
     /**

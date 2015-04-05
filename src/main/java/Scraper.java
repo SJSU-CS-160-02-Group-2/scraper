@@ -19,5 +19,5 @@ public interface Scraper {
      *
      * @return the list of site entries
      */
-    public Set<SiteEntry> scrape(Document doc) throws Exception;
+    public Set<SiteEntry> scrape(Document... doc) throws Exception;
 }

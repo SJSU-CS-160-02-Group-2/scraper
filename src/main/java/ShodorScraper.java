@@ -1,7 +1,6 @@
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -100,9 +99,12 @@ public class ShodorScraper extends BaseScraper {
         return elts.first();
     }
 
-    public Set<SiteEntry> scrape(Document doc) throws Exception {
+    public Set<SiteEntry> scrape(Document... docs) throws Exception {
         Set<SiteEntry> sites = new HashSet<>();
-        Element root = rootElement(doc);
+        Document bySubjectDoc = docs[0];
+        Document byAudienceDoc = docs[1];
+
+        Element root = rootElement(bySubjectDoc);
 
         // each child of the root node is the category div
         for (Element categoryElement : root.select("> div")) {
@@ -121,13 +123,79 @@ public class ShodorScraper extends BaseScraper {
                 SiteEntry.Builder builder = new SiteEntry.Builder();
                 builder.withCategory(category);
                 scrapeRowTitle(builder, siteElement);
+                scrapeRowContent(builder, siteElement);
 
                 SiteEntry siteEntry = builder.toSiteEntry();
-                log.info(siteEntry.toString());
+                //log.info(siteEntry.toString());
+
+                //sites.add(siteEntry);
+                addSite(sites, siteEntry);
             }
         }
 
+        for (SiteEntry site : sites) {
+            log.info(String.format("%s", site.toString()));
+        }
+
         return sites;
+    }
+
+    /**
+     * Find the given site from the given set of sites.
+     */
+    public SiteEntry find(Set<SiteEntry> sites, SiteEntry site) {
+        for (SiteEntry s : sites) {
+            // equality is based on the activity URL
+            if (s.equals(site)) {
+                return s;
+            }
+        }
+
+        return null;
+    }
+
+    public void addSite(Set<SiteEntry> sites, SiteEntry newEntry) {
+        if (sites.contains(newEntry)) {
+            SiteEntry site = find(sites, newEntry);
+            addCategories(site, newEntry);
+            addGrades(site, newEntry);
+        } else {
+            sites.add(newEntry);
+        }
+    }
+
+    /**
+     * Add the categories from the new entry to the
+     */
+    public void addCategories(SiteEntry oldEntry, SiteEntry newEntry) {
+        Set<String> oldCategories = oldEntry.getCategories();
+        Set<String> newCategories = newEntry.getCategories();
+
+        if (oldCategories == null) {
+            oldEntry.setCategories(newCategories);
+            return;
+        }
+
+        if (newCategories != null) {
+            oldCategories.addAll(newCategories);
+        }
+    }
+
+    /**
+     * Add the grades from the new entry to the
+     */
+    public void addGrades(SiteEntry oldEntry, SiteEntry newEntry) {
+        Set<Integer> oldGrades = oldEntry.getTargetGrades();
+        Set<Integer> newGrades = newEntry.getTargetGrades();
+
+        if (oldGrades == null) {
+            oldEntry.setTargetGrades(newGrades);
+            return;
+        }
+
+        if (newGrades != null) {
+            oldGrades.addAll(newGrades);
+        }
     }
 
     /**
@@ -155,8 +223,7 @@ public class ShodorScraper extends BaseScraper {
     }
 
     /**
-     * Scrapes all data from the div.rowTitle element of the given
-     * site node.
+     * Scrapes the title, activity URL, and image URL
      */
     protected SiteEntry.Builder scrapeRowTitle(SiteEntry.Builder builder,
             Element siteElement) {
@@ -184,5 +251,15 @@ public class ShodorScraper extends BaseScraper {
         builder.withIconImageUrl(imagePath);
 
         return builder;
+    }
+
+    /**
+     * Scrape the description
+     */
+    protected SiteEntry.Builder scrapeRowContent(SiteEntry.Builder builder,
+            Element siteElement) {
+        Element descriptionDiv = siteElement.select("div.rowContent > div").first();
+        String description = descriptionDiv.text();
+        return builder.withDescription(description);
     }
 }
