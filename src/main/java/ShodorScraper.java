@@ -28,22 +28,52 @@ public class ShodorScraper extends BaseScraper {
     private static final Pattern categoryIdPattern = Pattern.compile("listing0_ctg(\\d)");
     private static final Pattern relativeImagePathPattern = Pattern.compile("background-image:url\\('(.+)'\\);");
 
-    private static final HashMap<Integer, String> categories;
+    private static final HashMap<Integer, String> CATEGORIES;
+    protected static final HashMap<Integer, Set<Integer>> GRADE_LEVELS;
 
     static {
-        categories = new HashMap<>();
-        categories.put(0, "algebra");
-        categories.put(1, "calculus");
-        categories.put(2, "discrete");
-        categories.put(3, "fractions");
-        categories.put(4, "geometry");
-        categories.put(5, "graphs");
-        categories.put(6, "modeling");
-        categories.put(7, "number and operations");
-        categories.put(8, "probability");
-        categories.put(9, "statistics");
-        categories.put(10, "trigonometry");
-        categories.put(11, "other");
+        CATEGORIES = new HashMap<>();
+        CATEGORIES.put(0, "algebra");
+        CATEGORIES.put(1, "calculus");
+        CATEGORIES.put(2, "discrete");
+        CATEGORIES.put(3, "fractions");
+        CATEGORIES.put(4, "geometry");
+        CATEGORIES.put(5, "graphs");
+        CATEGORIES.put(6, "modeling");
+        CATEGORIES.put(7, "number and operations");
+        CATEGORIES.put(8, "probability");
+        CATEGORIES.put(9, "statistics");
+        CATEGORIES.put(10, "trigonometry");
+        CATEGORIES.put(11, "other");
+
+        GRADE_LEVELS = new HashMap<>();
+
+        HashSet<Integer> threeFive = new HashSet<>();
+        threeFive.add(3);
+        threeFive.add(4);
+        threeFive.add(5);
+
+        HashSet<Integer> sixEight = new HashSet<>();
+        sixEight.add(6);
+        sixEight.add(7);
+        sixEight.add(8);
+
+        HashSet<Integer> nineTwelve = new HashSet<>();
+        nineTwelve.add(9);
+        nineTwelve.add(10);
+        nineTwelve.add(11);
+        nineTwelve.add(12);
+
+        HashSet<Integer> undergraduate = new HashSet<>();
+        undergraduate.add(13);
+        undergraduate.add(14);
+        undergraduate.add(15);
+        undergraduate.add(16);
+
+        GRADE_LEVELS.put(0, threeFive);
+        GRADE_LEVELS.put(1, sixEight);
+        GRADE_LEVELS.put(2, nineTwelve);
+        GRADE_LEVELS.put(3, undergraduate);
     }
 
     public ShodorScraper() {
@@ -104,7 +134,14 @@ public class ShodorScraper extends BaseScraper {
         Document bySubjectDoc = docs[0];
         Document byAudienceDoc = docs[1];
 
-        Element root = rootElement(bySubjectDoc);
+        scrapeBySubject(sites, bySubjectDoc);
+        scrapeByAudience(sites, byAudienceDoc);
+
+        return sites;
+    }
+
+    public void scrapeBySubject(Set<SiteEntry> sites, Document doc) {
+        Element root = rootElement(doc);
 
         // each child of the root node is the category div
         for (Element categoryElement : root.select("> div")) {
@@ -124,20 +161,39 @@ public class ShodorScraper extends BaseScraper {
                 builder.withCategory(category);
                 scrapeRowTitle(builder, siteElement);
                 scrapeRowContent(builder, siteElement);
-
                 SiteEntry siteEntry = builder.toSiteEntry();
-                //log.info(siteEntry.toString());
 
-                //sites.add(siteEntry);
                 addSite(sites, siteEntry);
             }
         }
+    }
 
-        for (SiteEntry site : sites) {
-            log.info(String.format("%s", site.toString()));
+    public void scrapeByAudience(Set<SiteEntry> sites, Document doc) {
+        Element root = rootElement(doc);
+
+        // each child of the root node is the category div
+        for (Element categoryElement : root.select("> div")) {
+            HashSet<Integer> grades = null;
+
+            try{
+                grades = scrapeGradeLevel(categoryElement);
+            } catch (Exception e) {
+                // skip elements that don't match this pattern
+                continue;
+            }
+
+            Elements categoryChildren = categoryElement.select("> div:not(div.listingHeader)");
+
+            for (Element siteElement : categoryChildren) {
+                SiteEntry.Builder builder = new SiteEntry.Builder();
+                builder.withTargetGrades((HashSet<Integer>) grades.clone());
+                scrapeRowTitle(builder, siteElement);
+                scrapeRowContent(builder, siteElement);
+                SiteEntry siteEntry = builder.toSiteEntry();
+
+                addSite(sites, siteEntry);
+            }
         }
-
-        return sites;
     }
 
     /**
@@ -198,11 +254,7 @@ public class ShodorScraper extends BaseScraper {
         }
     }
 
-    /**
-     * Scrape the title out of the categoryNode.
-     * @throws Exception
-     */
-    protected String scrapeCategory(Node categoryNode) throws Exception {
+    protected int parseCategoryNumber(Node categoryNode) throws Exception {
         String id = categoryNode.attr("id");
         Matcher m = categoryIdPattern.matcher(id);
 
@@ -213,7 +265,16 @@ public class ShodorScraper extends BaseScraper {
         String catNumStr = m.group(CATEGORY_ID_GROUP_NUM);
         Integer catNum = new Integer(catNumStr);
 
-        String category = categories.get(catNum);
+        return catNum;
+    }
+
+    /**
+     * Scrape the title out of the categoryNode.
+     * @throws Exception
+     */
+    protected String scrapeCategory(Node categoryNode) throws Exception {
+        Integer catNum = parseCategoryNumber(categoryNode);
+        String category = CATEGORIES.get(catNum);
 
         if (category == null) {
             throw new Exception("unknown category number");
@@ -223,11 +284,25 @@ public class ShodorScraper extends BaseScraper {
     }
 
     /**
+     * Scrape the grade level out of a category node
+     * @throws Exception
+     */
+    protected HashSet<Integer> scrapeGradeLevel(Node categoryNode) throws Exception {
+        Integer catNum = parseCategoryNumber(categoryNode);
+        HashSet<Integer> gradeLevel = (HashSet<Integer>) GRADE_LEVELS.get(catNum);
+
+        if (gradeLevel == null) {
+            throw new Exception("unknown category number");
+        }
+
+        return (HashSet<Integer>) gradeLevel.clone();
+    }
+
+    /**
      * Scrapes the title, activity URL, and image URL
      */
     protected SiteEntry.Builder scrapeRowTitle(SiteEntry.Builder builder,
             Element siteElement) {
-        //log.info(siteElt.outerHtml());
         Element rowTitleElt = siteElement.select("div.rowTitle").first();
 
         // get the title
@@ -242,7 +317,6 @@ public class ShodorScraper extends BaseScraper {
         // get the image URL
         Element imageDiv = rowTitleElt.select("> div").first();
         String styleStr = imageDiv.attr("style");
-        //log.info(styleStr);
 
         Matcher m = relativeImagePathPattern.matcher(styleStr);
         m.find();

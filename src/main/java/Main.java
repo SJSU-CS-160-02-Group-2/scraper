@@ -12,5 +12,7 @@ public class Main {
         for (SiteEntry site : sites) {
             System.out.printf("%s\n\n", site.toString());
         }
+
+        System.out.printf("Scraped %d entries\n", sites.size());
     }
 }

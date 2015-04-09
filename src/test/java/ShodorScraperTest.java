@@ -130,6 +130,18 @@ public class ShodorScraperTest {
 
         assertEquals(correctCategories, site.getCategories());
 
-        logger.info(String.format("%s", site.getTargetGrades()));
+        logger.info(String.format("threeFive: %s", ShodorScraper.GRADE_LEVELS.get(0)));
+        logger.info(String.format("sixEight: %s", ShodorScraper.GRADE_LEVELS.get(1)));
+        logger.info(String.format("nineTwelve: %s", ShodorScraper.GRADE_LEVELS.get(2)));
+        logger.info(String.format("undergraduate: %s", ShodorScraper.GRADE_LEVELS.get(3)));
+
+        Set<Integer> correctGrades = new HashSet<>();
+        correctGrades.addAll(ShodorScraper.GRADE_LEVELS.get(0));
+        correctGrades.addAll(ShodorScraper.GRADE_LEVELS.get(1));
+        correctGrades.addAll(ShodorScraper.GRADE_LEVELS.get(2));
+
+        logger.info(String.format("site target grades: %s", site.getTargetGrades()));
+        logger.info(String.format("correctGrades: %s", correctGrades));
+        assertEquals(correctGrades, site.getTargetGrades());
     }
 }
