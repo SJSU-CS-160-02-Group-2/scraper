@@ -182,6 +182,11 @@ public class ShodorScraper extends BaseScraper {
                 continue;
             }
 
+            // skip undergraduate activities
+            if (grades.equals(GRADE_LEVELS.get(3))) {
+                continue;
+            }
+
             Elements categoryChildren = categoryElement.select("> div:not(div.listingHeader)");
 
             for (Element siteElement : categoryChildren) {
