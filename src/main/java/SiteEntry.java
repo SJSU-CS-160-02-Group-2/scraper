@@ -37,10 +37,12 @@ public class SiteEntry {
     public String toString() {
         String catsString = stripBrackets(categories.toString());
         String gradesString = stripBrackets(targetGrades.toString());
+        String escapedTitle = title.replaceAll("\\'", "''");
+        String escapedDesc = description.replaceAll("\\'", "''");
 
         return String.format(
             "%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s",
-            title, description, activityUrl, iconImageUrl, catsString, gradesString,
+            escapedTitle, escapedDesc, activityUrl, iconImageUrl, catsString, gradesString,
             AUTHOR, CONTENT_TYPE, isoTime
         );
     }
