@@ -46,11 +46,13 @@ public class SiteEntry {
     }
 
     private String stripBrackets(String s) {
-        if (s.length() < 3) {
-            return s;
+        String stripped = s.replaceAll("\\s", "");
+
+        if (stripped.length() < 3) {
+            return stripped;
         }
 
-        return s.substring(1, s.length()-1);
+        return stripped.substring(1, stripped.length()-1);
     }
 
     /**
