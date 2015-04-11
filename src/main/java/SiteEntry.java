@@ -7,6 +7,7 @@ import java.util.TimeZone;
 
 public class SiteEntry {
     private static final String AUTHOR = "Shodor Education Foundation, Inc.";
+    private static final String CONTENT_TYPE = "interactive lesson";
 
     private String title;
     private String description;
@@ -40,7 +41,7 @@ public class SiteEntry {
         return String.format(
             "%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s",
             title, description, activityUrl, iconImageUrl, catsString, gradesString,
-            AUTHOR, "", isoTime
+            AUTHOR, CONTENT_TYPE, isoTime
         );
     }
 
