@@ -1,7 +1,13 @@
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TimeZone;
 
 public class SiteEntry {
+    private static final String AUTHOR = "Shodor Education Foundation, Inc.";
+
     private String title;
     private String description;
     private Set<String> categories;
@@ -9,6 +15,7 @@ public class SiteEntry {
     private String iconImageUrl;
     private String activityUrl;
     private Set<String> contributors;
+    private String isoTime;
 
     public SiteEntry(Builder builder) {
         this.title = builder.getTitle();
@@ -18,16 +25,31 @@ public class SiteEntry {
         this.iconImageUrl = builder.getIconImageUrl();
         this.activityUrl = builder.getActivityUrl();
         this.contributors = builder.getContributors();
+
+        TimeZone tz = TimeZone.getTimeZone("UTC");
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'");
+        df.setTimeZone(tz);
+        this.isoTime = df.format(new Date());
     }
 
     @Override
     public String toString() {
+        String catsString = stripBrackets(categories.toString());
+        String gradesString = stripBrackets(targetGrades.toString());
+
         return String.format(
-            "title:%s description:%s categories:%s targetGrades:%s" +
-            " iconImageUrl:%s activityUrl:%s contributors:%s",
-            title, description, categories, targetGrades, iconImageUrl,
-            activityUrl, contributors
+            "%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s",
+            title, description, activityUrl, iconImageUrl, catsString, gradesString,
+            AUTHOR, "", isoTime
         );
+    }
+
+    private String stripBrackets(String s) {
+        if (s.length() < 3) {
+            return s;
+        }
+
+        return s.substring(1, s.length()-1);
     }
 
     /**
