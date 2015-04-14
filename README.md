@@ -32,3 +32,8 @@ $ ./gradlew eclipse
 ```
 
 Then in Eclipse, you can import this directory as an Eclipse project.
+---------------------------------------------------------------------------------
+Doing everything above will create a text file (data.txt) with output in it.
+Then, setup the database sructure  by importing education.sql (from canvas) file from canvas.t
+Run dbwriter.php [writes everything to the db] : localhost/view.php  
+Then, run view.php.
