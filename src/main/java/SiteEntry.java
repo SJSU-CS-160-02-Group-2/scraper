@@ -2,6 +2,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.TimeZone;
 
@@ -35,8 +36,8 @@ public class SiteEntry {
 
     @Override
     public String toString() {
-        String catsString = stripBrackets(categories.toString());
-        String gradesString = stripBrackets(targetGrades.toString());
+        String catsString = hashSetToString(categories);
+        String gradesString = hashSetToString(targetGrades);
         String escapedTitle = title.replaceAll("\\'", "''");
         String escapedDesc = description.replaceAll("\\'", "''");
 
@@ -55,6 +56,24 @@ public class SiteEntry {
         }
 
         return stripped.substring(1, stripped.length()-1);
+    }
+
+    private String hashSetToString(Set<?> set) {
+        StringBuilder sb = new StringBuilder();
+        final String delim = ",";
+        Object cur = null;
+        Iterator<?> it = set.iterator();
+
+        while (it.hasNext()) {
+            cur = it.next();
+            sb.append(cur.toString());
+
+            if ((it.hasNext())) {
+                sb.append(delim);
+            }
+        }
+
+        return sb.toString();
     }
 
     /**
